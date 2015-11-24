@@ -6,6 +6,7 @@ import Data.IORef
 import StopWatch
 import FRP.Yampa
 import Sdl2
+import Helper
 import Foreign.C.Types
 import qualified Data.Map as Map
 import Data.Maybe (fromJust)
@@ -15,44 +16,45 @@ import qualified Linear as L
 
 
 initialize :: IO GameInput
-initialize = return $ GameInput 0 False
+initialize = return $ GameInput 0 NoSDLEvent
 
 sense :: (IORef Stopwatch) -> Bool -> IO (DTime, Maybe GameInput)
 sense ref _ = do
   (dt, timePassed) <- diffTime ref
   g <- getStdGen
     
-  event      <- pollEvent            
+  event <- pollEvent            
         
-  return (dt, Just (GameInput timePassed (quit event)))
-
- where 
-  quit e =
-   case e of
-    Nothing -> False
-    Just e' -> 
-      case eventPayload e' of 
-        QuitEvent -> True
-        _                   -> False 
+  return (dt, Just (GameInput timePassed (processSdlEvent event)))
 
 actuate :: Rendering -> Bool -> GameOutput -> IO Bool
 actuate (Rendering rd ps bs fs) _ o = 
   case o of 
     Nothing -> return True
-    Just (vs,q) ->
-      do clear rd
+    Just (vs,e) ->
+      do let (d,q) =
+              case e of
+                NoSDLEvent -> (False,False)
+                Quit       -> (False,True)
+                DebugOn    -> (True,False)
+
+         clear rd
          mapM_ (\s -> renderTexture rd s (0,0)) bs
-         mapM_ renderObject vs 
+         mapM_ (renderObject d) vs  
          mapM_ (\s -> renderTexture rd s (0,0)) fs
          present rd
          return q
          
-  where renderObject v = do
+  where renderObject d v = do
          let (x,y,_) = pos v
              (u,k,_) = vel v
              (a,b,_) = acc v
 
-             (pn, pntSrc, w, h) = sprites v
+             (pn, pntSrc, w, h) =
+              if u <= 0
+              then fst $ sprites v
+              else snd $ sprites v
+
              x' = round (x - (fromIntegral w)/2)
              y' = fromIntegral $ windowHeight
                   - round (y + (fromIntegral h)/2)
@@ -68,8 +70,7 @@ actuate (Rendering rd ps bs fs) _ o =
              a' = round (x + a)
              b' = fromIntegral $ windowHeight
                   - round (y + b )
-         --putStrLn . ppShow $ (magic.pos $ v , magic.vel $ v, magic.acc $ v)
-         --putStrLn . ppShow $ (x',y',u',k')
+         
          
 
 
@@ -78,8 +79,12 @@ actuate (Rendering rd ps bs fs) _ o =
                       pntSrc
                       (x', y')
                       w h
-         --dLine rd (255,0,0,255) (x'', y'') (a',b')
-         --dLine rd (0,255,0,255) (x'', y'') (u',k')
+         if d
+         then do putStrLn . ppShow $ (magic.pos $ v , magic.vel $ v, magic.acc $ v)
+                 dLine rd (255,0,0,255) (x'', y'') (a',b')
+                 dLine rd (0,255,0,255) (x'', y'') (u',k')
+         else return ()
+
          rendererDrawColor rd $= L.V4 0 0 0 0
 
 magic :: Vec3 -> (Int,Int,Int)

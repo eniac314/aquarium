@@ -1,6 +1,6 @@
 module Core where
 import FRP.Yampa
-import Animal
+import Bluefish
 import Types
 import System.Random
 import qualified Data.Map as Map
@@ -14,7 +14,7 @@ process g =
   proc inp -> do
   rec 
    oOuts <- gameCore col -< (inp,oOuts)
-  returnA -< Just (Map.elems $ Map.map obsState oOuts,quitEv inp)
+  returnA -< Just (Map.elems $ Map.map obsState oOuts,sdlEvent inp)
 
 gameCore :: Col Object -> SF (GameInput, Col ObjOutput) (Col ObjOutput) 
 gameCore objs = 

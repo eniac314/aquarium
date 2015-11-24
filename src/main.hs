@@ -4,7 +4,7 @@ import Sdl2
 import Types
 import IO 
 import StopWatch
-import Animal
+import Bluefish
 import Core
 import Control.Monad
 import qualified Data.Text as Text

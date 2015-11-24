@@ -32,10 +32,10 @@ y3 (x,y,z) = y
 {- Game Types -}
 
 data GameInput  = GameInput { dt :: !DTime
-                            , quitEv :: !Bool
+                            , sdlEvent :: SDLEvent
                             }
 
-type GameOutput = Maybe ([ObjectState],Bool)
+type GameOutput = Maybe ([ObjectState],SDLEvent)
 
 data Rendering  = Rendering { render    :: Renderer
                             , spriteMap :: Pics
@@ -52,16 +52,15 @@ data ObjectInit =
   AnimalInit { pos0 :: !Pos
              , vel0 :: !Vel
              , acc0 :: !Acc
-             , sprites0 :: !([Clip],[Clip])
+             , sprites0 :: ![(Clip,Clip)]
              , gen0 :: !StdGen
              , id0 :: !ID
-             , direct :: Direction
              } 
 
  | ThingInit { pos0 :: !Pos
              , vel0 :: !Vel
              , acc0 :: !Acc
-             , sprites0 :: !([Clip],[Clip])
+             , sprites0 :: ![(Clip,Clip)]
              , gen0 :: !StdGen
              , id0 :: !ID
              } 
@@ -70,14 +69,14 @@ data ObjectState =
     Animal { pos :: !Pos
            , vel :: !Vel
            , acc :: !Acc
-           , sprites :: !Clip
+           , sprites :: !(Clip,Clip)
            , idSt :: !ID         
            } 
 
   | Thing { pos :: !Pos
           , vel :: !Vel
           , acc :: !Acc
-          , sprites :: !Clip
+          , sprites :: !(Clip,Clip)
           , idSt :: !ID
           } deriving (Generic,NFData)
 
@@ -116,31 +115,8 @@ data PicName = FishPic
 
 data ID = BlueFish deriving (Ord,Eq,Show,Generic,NFData)
 
-osc :: Int -> Int -> Int -> [Int]
-osc a b c = cycle $ [a,a+c..b] ++ [b,b-c..a+c]
 
-slow :: Int -> [a] -> [a]
-slow 0 xs = xs
-slow n [] = []
-slow n (x:xs) = go n x [] ++ (slow n xs) where go 0 _ xs = xs
-                                               go n x xs = go (n-1) x (x:xs)
+data SDLEvent = Quit | Mouse (Double,Double) | NoSDLEvent | DebugOn 
 
-getPos :: ObjOutput -> Pos
-getPos = pos . obsState
+            
 
-getVel :: ObjOutput -> Pos
-getVel = vel . obsState
-
-getAcc :: ObjOutput -> Pos
-getAcc = acc . obsState
-
-swap (a,b) = (b,a)
-
---whnfList xs = List.foldl' (flip seq) () xs `seq` xs
-
---printState :: ObjectState -> IO ()
---printState ost =
--- let p = pos ost
---     n = idSt ost
---     e = envi
--- in putStrLn $ Pr.ppShow (n,p)
