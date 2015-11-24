@@ -13,6 +13,7 @@ aquarium
 aqua.sublime-project
 aqua.sublime-workspace
 .cabal-sandbox
+sdl2-image
 
 # Packages #
 ############
