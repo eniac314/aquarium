@@ -17,35 +17,33 @@ vMax = 100
 aMax = 20
 
 fish :: ObjectInit -> Object
-fish initial = update 
- where
-  update =
-   proc inp -> do
-   rec
-    rx  <- noiseR (-500.0,fromIntegral windowWidth+500) g  -< ()
-    ry  <- noiseR (-500.0,fromIntegral windowHeight+500) g  -< ()
+fish initial = 
+  proc inp -> do
+  rec
+   rx  <- noiseR (-500.0,fromIntegral windowWidth+500) g  -< ()
+   ry  <- noiseR (-500.0,fromIntegral windowHeight+500) g  -< ()
 
-    e  <- repeatedly 5 () -< ()
-    np <- hold center -< tag e (rx,ry,0.0)
+   e  <- repeatedly 5 () -< ()
+   np <- hold center -< tag e (rx,ry,0.0)
 
-    a  <- iPre a0 <<< (arr flocking) -< (p,v,inp,np)
-    v  <- integral >>^ (^+^ v0) -< a
-    p  <- integral >>^ (^+^ p0) -< v
+   a  <- iPre a0 <<< (arr flocking) -< (p,v,inp,np)
+   v  <- integral >>^ (^+^ v0) -< a
+   p  <- integral >>^ (^+^ p0) -< v
                           
    
-   s   <- listToSignal spr 4    -< log (norm a + 1)
+   s   <- listToSignal spr 1 15 -<   (norm a)
     
-   let st  = Animal { pos = p
-                    , vel = v
-                    , acc = a
-                    , sprites = s
-                    , idSt = id0 initial
-                    }
-       out = ObjOutput { obsState = deepseq st st
+  let st  = Animal { pos = p
+                   , vel = v
+                   , acc = a
+                   , sprites = s
+                   , idSt = id0 initial
+                   }
+      out = ObjOutput { obsState = deepseq st st
                        , killReq  = NoEvent
                        , spawnReq = NoEvent
                        }
-   returnA -< out 
+  returnA -< out 
               
    where 
     v0 = vel0 initial
@@ -57,9 +55,11 @@ fish initial = update
 
 flocking :: (Vec3,Vec3, ObjInput,Vec3) -> Vec3
 flocking (p,vm,(ObjInput gi env),p') =
- let n  = fromIntegral . length $ env
+ 
+ let n  = fromIntegral . length $ env'
      distObj = norm (p ^-^ p') 
      speed = norm vm
+     env' = filter (\o -> idSt o == Bluefish) env
      
      --friction
      fr = safeNormalize $ negateVector vm
@@ -67,20 +67,21 @@ flocking (p,vm,(ObjInput gi env),p') =
      
      --Cohesion
      avrgLoc =
-      let (x,y,z) = foldl' (\a o -> pos o ^+^ a) (0,0,0) env    
+      let (x,y,z) = foldl' (\a o -> pos o ^+^ a) (0,0,0) env'    
           (u,v,w) = ((x,y,z)^/n) ^-^ p
       in  safeNormalize $ (u/maxAccX,v/maxAccY,w) 
      --Alignment
      avrgHeading =
-      let (vx,vy,vz) = foldl' (\a o -> vel o ^+^ a) (0,0,0) env    
+      let (vx,vy,vz) = foldl' (\a o -> vel o ^+^ a) (0,0,0) env'    
       in safeNormalize $ (vx,vy,vz)^/n
      --Separation
      separate = 
       let subSet = filter (\o -> fishMinDist >= norm (pos o ^-^ p)) env
+          n = fromIntegral . length $ subSet 
           getVec o = norm (pos o ^-^ p) *^ safeNormalize (p ^-^ pos o) 
           dm = map (\o -> getVec o) subSet
           (dx,dy,dz) = foldl' (^+^) (0,0,0) dm
-      in safeNormalize  $ (dx,dy,dz)^/n
+      in if n /= 0 then safeNormalize  $ (dx,dy,dz)^/n else nullVec
 
  in if n /= 0 
     then
@@ -103,7 +104,7 @@ randFish g =
       (a,g5) = randomR (-10,10) g4
       (b,g6) = randomR (-5,5) g5
       cs = zip fishLeftAnim fishRightAnim
-      fi = AnimalInit (x,y,0) (u,v,0) (a,b,0) cs g6 BlueFish
+      fi = AnimalInit (x,y,0) (u,v,0) (a,b,0) cs g6 Bluefish
   in (fish fi,g6)
 
 randFishes :: Int -> StdGen -> [Object]

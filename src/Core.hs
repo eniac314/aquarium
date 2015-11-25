@@ -1,20 +1,26 @@
 module Core where
 import FRP.Yampa
 import Bluefish
+import Vegetation
 import Types
+import Col
+import Helper
 import System.Random
-import qualified Data.Map as Map
 
 {-# LANGUAGE Arrows, BangPatterns #-}
 
 process ::  StdGen -> SF GameInput GameOutput
 process g = 
-  let fs = randFishes 7 g
-      col = Map.fromList $ zip [0..] fs in
+  let bsw = baseSeaweed g
+      ssw = randSeaweeds 25 g
+      fs = randFishes 15 g
+      c1 = (listToCol Bluefish) fs
+      c2 = (listToCol SmallSeaweed) ssw
+      c3 = insertCol bsw BigSeaweed (unionCol c1 c2) in
   proc inp -> do
   rec 
-   oOuts <- gameCore col -< (inp,oOuts)
-  returnA -< Just (Map.elems $ Map.map obsState oOuts,sdlEvent inp)
+   oOuts <- gameCore c3 -< (inp,oOuts)
+  returnA -< Just (elemsCol $ fmap obsState oOuts,sdlEvent inp)
 
 gameCore :: Col Object -> SF (GameInput, Col ObjOutput) (Col ObjOutput) 
 gameCore objs = 
@@ -26,21 +32,26 @@ gameCore objs =
 
 route :: (GameInput, Col ObjOutput) -> Col sf -> Col (ObjInput, sf)
 route (gi, oOuts) sfs =
-  Map.mapWithKey route' sfs
-   where route' k sf = (ObjInput gi (neigh k), sf)
+  mapCol route' sfs
+   where route' (k,sf) = (ObjInput gi (neigh k), sf)
          allNeighbours = neighbours oOuts
          neigh key =
-          case Map.lookup key allNeighbours of
+          case lookupCol key allNeighbours of
                 Nothing -> []
                 Just n ->
-                  Map.elems $ Map.delete key (Map.map obsState n)
+                  elemsCol $ deleteCol key (fmap obsState n)
 
 
 
 neighbours :: Col ObjOutput -> Col (Col ObjOutput)
-neighbours m = Map.map neighbours' m
+neighbours m = fmap neighbours' m
  where
  neighbours' v = 
-  let p = pos . obsState $ v
-      f = \objOut -> 300 >= (norm $ (pos . obsState $ objOut) ^-^ p) 
-  in  Map.filter f m
+  case getId v of
+    BigSeaweed   -> emptyCol
+    SmallSeaweed -> emptyCol
+    _            ->
+     
+     let p = pos . obsState $ v
+         f = \objOut -> 300 >= (norm $ (pos . obsState $ objOut) ^-^ p) 
+     in  filterCol f m

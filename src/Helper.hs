@@ -23,6 +23,9 @@ getVel = vel . obsState
 getAcc :: ObjOutput -> Pos
 getAcc = acc . obsState
 
+getId :: ObjOutput -> ID
+getId = idSt . obsState
+
 swap (a,b) = (b,a)
 
 --whnfList xs = List.foldl' (flip seq) () xs `seq` xs
@@ -75,23 +78,32 @@ safeNormalize v
  | otherwise = normalize v
 
 
-listToSignal :: [a] -> Int -> SF Scalar a
-listToSignal xs i = 
+
+listToSignal :: [a] -> Int -> Scalar -> SF Scalar a
+listToSignal xs i d = 
  let v = Vec.fromList (slow i xs)
      n = Vec.length v
  in proc inp -> do
     t <- localTime -< inp
-    returnA -< (Vec.!) v (mod (round (abs t*inp)) n)
+    returnA -< (Vec.!) v (mod (floor ((fromIntegral (round (inp/d)))*t)) n)
 
+listToSignal' :: [a] -> Int -> Scalar -> SF Scalar a
+listToSignal' xs i d = 
+ let v = Vec.fromList (slow i xs)
+     n = Vec.length v
+ in proc inp -> do
+    t <- localTime -< inp
+    returnA -< (Vec.!) v (mod (floor $ 5*t) n)
 
-testHold = 
-  proc inp -> do 
-  n <- listToSignal [1,2,3,4,5] 1 -< 1
-  e <- repeatedly 0.5 () -< ()
-  h <- hold 0 -< tag e n
-  returnA -< h
+clampVal :: Double -> Double -> Double -> Double
+clampVal a b v  
+ | v < a = a
+ | v > b = b
+ | otherwise = v
 
-t = (take 2000) $ embed (testHold) (1, repeat (0.1,Nothing))
+f = round.(*10)
+
+t = (take 2000) $ embed (time >>> arr f) (1, repeat (0.1,Nothing))
 
 processSdlEvent :: Maybe SDL.Event -> SDLEvent
 processSdlEvent event =  
@@ -105,3 +117,16 @@ processSdlEvent event =
                 KeycodeEscape -> Quit
                 _        -> NoSDLEvent
     _ -> NoSDLEvent 
+
+
+--flocking' :: (Vec3,Vec3, ObjInput,Vec3) -> Vec3
+--flocking' (pos, vm, (ObjInput gi env), p') =
+ 
+-- let closeEnvi = filter (\o -> fishMinDist >= norm (pos o ^-^ p)) env
+--     n = fromIntegral . length $ env
+--     m = fromIntegral . length $ closeEnvi
+
+--     --friction
+--     fr = safeNormalize $ negateVector vm
+--     friction = (aMax*speed/vMax)*^fr 
+

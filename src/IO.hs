@@ -80,7 +80,8 @@ actuate (Rendering rd ps bs fs) _ o =
                       (x', y')
                       w h
          if d
-         then do putStrLn . ppShow $ (magic.pos $ v , magic.vel $ v, magic.acc $ v)
+         then do --putStrLn . ppShow $ (magic.pos $ v , magic.vel $ v, magic.acc $ v)
+                 putStrLn . ppShow $ round.norm.acc $ v
                  dLine rd (255,0,0,255) (x'', y'') (a',b')
                  dLine rd (0,255,0,255) (x'', y'') (u',k')
          else return ()

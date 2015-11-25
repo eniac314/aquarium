@@ -7,6 +7,7 @@ import StopWatch
 import Bluefish
 import Core
 import Control.Monad
+import Helper
 import qualified Data.Text as Text
 import Foreign.C.Types
 import qualified Linear as L
@@ -50,12 +51,16 @@ main = do
   g <- getStdGen
 
   f <- loadTexture rd "./images/bluefish.png"
+  bsw <- loadTexture rd "./images/seaweed_test.png"
+  ssw <- loadTexture rd "./images/smallSeaweed.png"
   b1 <- loadTexture rd "./images/background_1.png"
   b2 <- loadTexture rd "./images/background_Back.png"
   b3 <- loadTexture rd "./images/background_Mid.png"
   b4 <- loadTexture rd "./images/background_Front.png"
 
-  let render = Rendering rd (Map.fromList [(FishPic,f)]) [b1,b2,b3] [b4]
+  let render = Rendering rd (Map.fromList [(BigSeaweedPic,bsw)
+                                          ,(FishPic,f)
+                                          ,(SmallSeaweedPic,ssw)]) [b1,b2,b3] [b4]
   
   reactimate initialize (sense handle) (actuate render) (process g)
 

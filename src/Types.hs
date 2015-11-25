@@ -98,9 +98,10 @@ data ObjOutput =
 --------------------------------------------------------------------------
 {- Miscs -}
 
-type Key = Int
+nullVec :: Vec3
+nullVec = (0,0,0)
 
-type Col a = Map.Map Key a
+type Key = Int
 
 type Clip = (PicName, Pnt, CInt, CInt)
 
@@ -111,9 +112,15 @@ data Change = XOut | YOut | Impact | Swap
 data PicName = FishPic
              | CrabPic
              | StonePic
-             | BubblePic deriving (Ord,Eq,Show,Generic,NFData)
+             | BubblePic
+             | BigSeaweedPic
+             | SmallSeaweedPic deriving (Ord,Eq,Show,Generic,NFData)
 
-data ID = BlueFish deriving (Ord,Eq,Show,Generic,NFData)
+data ID = Bluefish
+        | Stone
+        | BigSeaweed
+        | SmallSeaweed
+        | Bubble deriving (Ord,Eq,Show,Generic,NFData)
 
 
 data SDLEvent = Quit | Mouse (Double,Double) | NoSDLEvent | DebugOn 
