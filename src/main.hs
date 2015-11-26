@@ -49,7 +49,7 @@ main = do
   g <- getStdGen
 
   f <- loadTexture rd "./images/bluefish.png"
-  --bsw <- loadTexture rd "./images/seaweed_test.png"
+  bsw <- loadTexture rd "./images/seaweed_test.png"
   ssw <- loadTexture rd "./images/smallSeaweed.png"
   b1 <- loadTexture rd "./images/background.png"
   b2 <- loadTexture rd "./images/Back.png"
@@ -60,7 +60,8 @@ main = do
 
   let render = Rendering rd
                          (Map.fromList [(FishPic,f)
-                                       ,(SmallSeaweedPic,ssw)])
+                                       ,(SmallSeaweedPic,ssw)
+                                       ,(BigSeaweedPic,bsw)])
                         [b1,b2,b3,b4,b5] [f1]
   
   reactimate initialize (sense handle) (actuate render) (process g)

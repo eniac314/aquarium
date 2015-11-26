@@ -114,8 +114,8 @@ processSdlEvent event =
   Just e  ->
    case eventPayload e of 
     QuitEvent -> Quit
-    --MouseMotionEvent(MouseMotionEventData _ _ bs (P (L.V2 x y)) _) ->
-    -- Mouse (fromIntegral x, fromIntegral y)
+    MouseMotionEvent(MouseMotionEventData _ _ bs (P (L.V2 x y)) _) ->
+     Mouse (fromIntegral x, fromIntegral y)
     KeyboardEvent (KeyboardEventData _ _ _ (Keysym _ kc _)) ->
      case kc of KeycodeD -> DebugOn
                 KeycodeEscape -> Quit

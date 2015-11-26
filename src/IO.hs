@@ -35,18 +35,18 @@ actuate (Rendering rd ps bs fs) _ o =
   case o of 
     Nothing -> return True
     Just (vs,e) ->
-      do --let (d,q,mp) =
-         --     case e of
-         --       NoSDLEvent  -> (False,False,Nothing)
-         --       Quit        -> (False,True,Nothing)
-         --       DebugOn     -> (True,False,Nothing)
-         --       Mouse (x,y) -> (False,False,Just (x,y))
-
-         let (d,q) =
+      do let (d,q,mp) =
               case e of
-                NoSDLEvent  -> (False,False)
-                Quit        -> (False,True)
-                DebugOn     -> (True,False)
+                NoSDLEvent  -> (False,False,Nothing)
+                Quit        -> (False,True,Nothing)
+                DebugOn     -> (True,False,Nothing)
+                Mouse (x,y) -> (False,False,Just (x,y))
+
+         --let (d,q) =
+         --     case e of
+         --       NoSDLEvent  -> (False,False)
+         --       Quit        -> (False,True)
+         --       DebugOn     -> (True,False)
                 
          clear rd
          mapM_ (\s -> renderTexture rd s (0,0)) bs
