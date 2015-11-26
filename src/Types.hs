@@ -5,7 +5,7 @@ import FRP.Yampa
 import Foreign.C.Types
 import System.Random
 import Sdl2
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import qualified Text.Show.Pretty as Pr
 import GHC.Generics (Generic)
 import Control.DeepSeq
@@ -123,7 +123,10 @@ data ID = Bluefish
         | Bubble deriving (Ord,Eq,Show,Generic,NFData)
 
 
-data SDLEvent = Quit | Mouse (Double,Double) | NoSDLEvent | DebugOn 
+data SDLEvent = Quit | Mouse (Double,Double) | NoSDLEvent | DebugOn
+              | MouseL ButtonState | MouseR ButtonState
+
+data ButtonState = Pressed | Released
 
             
 

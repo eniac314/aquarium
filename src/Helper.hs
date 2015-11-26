@@ -3,7 +3,9 @@ import FRP.Yampa
 import Types
 import System.Random
 import qualified Data.Vector as Vec
-import SDL hiding (time)
+import SDL hiding (time, Mouse)
+import qualified Linear as L 
+import Linear.Affine
 
 osc :: Int -> Int -> Int -> [Int]
 osc a b c = cycle $ [a,a+c..b] ++ [b,b-c..a+c]
@@ -112,6 +114,8 @@ processSdlEvent event =
   Just e  ->
    case eventPayload e of 
     QuitEvent -> Quit
+    --MouseMotionEvent(MouseMotionEventData _ _ bs (P (L.V2 x y)) _) ->
+    -- Mouse (fromIntegral x, fromIntegral y)
     KeyboardEvent (KeyboardEventData _ _ _ (Keysym _ kc _)) ->
      case kc of KeycodeD -> DebugOn
                 KeycodeEscape -> Quit

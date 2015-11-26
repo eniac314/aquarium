@@ -21,7 +21,7 @@ fish initial =
   proc inp -> do
   rec
    rx  <- noiseR (-500.0,fromIntegral windowWidth+500) g  -< ()
-   ry  <- noiseR (-500.0,fromIntegral windowHeight+500) g  -< ()
+   ry  <- noiseR (200,fromIntegral windowHeight+500) g  -< ()
 
    e  <- repeatedly 5 () -< ()
    np <- hold center -< tag e (rx,ry,0.0)
@@ -98,7 +98,7 @@ flocking (p,vm,(ObjInput gi env),p') =
 randFish :: StdGen -> (Object,StdGen)
 randFish g =
   let (x,g1) = randomR (25,fromIntegral windowWidth - 25) g
-      (y,g2) = randomR (25,fromIntegral windowHeight - 25) g1
+      (y,g2) = randomR (200,fromIntegral windowHeight - 25) g1
       (u,g3) = randomR (-100,100) g2
       (v,g4) = randomR (-40,40) g3
       (a,g5) = randomR (-10,10) g4

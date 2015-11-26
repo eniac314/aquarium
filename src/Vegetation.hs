@@ -45,7 +45,7 @@ baseSeaweed g =
 
 randSeaweed :: StdGen -> (Object,StdGen)
 randSeaweed g = 
-  let (x,g1) = randomR (25, fromIntegral windowWidth - 25) g
+  let (x,g1) = randomR (25, 775) g
       (y,g2) = randomR (25,150) g1
       cs = zip smallSeaweedAnim smallSeaweedAnim
       sw = ThingInit (x,y,0) nullVec nullVec cs g2 SmallSeaweed

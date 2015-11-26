@@ -15,11 +15,9 @@ import Linear.Affine
 import qualified Text.Show.Pretty as Pr
 import System.Random
 import qualified SDL.Image as SDLI
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 
 {-# LANGUAGE Arrows, BangPatterns #-}
-
-
 
 
 initWindow = 
@@ -51,16 +49,19 @@ main = do
   g <- getStdGen
 
   f <- loadTexture rd "./images/bluefish.png"
-  bsw <- loadTexture rd "./images/seaweed_test.png"
+  --bsw <- loadTexture rd "./images/seaweed_test.png"
   ssw <- loadTexture rd "./images/smallSeaweed.png"
-  b1 <- loadTexture rd "./images/background_1.png"
-  b2 <- loadTexture rd "./images/background_Back.png"
-  b3 <- loadTexture rd "./images/background_Mid.png"
-  b4 <- loadTexture rd "./images/background_Front.png"
+  b1 <- loadTexture rd "./images/background.png"
+  b2 <- loadTexture rd "./images/Back.png"
+  b3 <- loadTexture rd "./images/MidRocks.png"
+  b4 <- loadTexture rd "./images/Midstones.png"
+  b5 <- loadTexture rd "./images/FrontGreenCorals.png"
+  f1 <- loadTexture rd "./images/FrontRedCorals.png"
 
-  let render = Rendering rd (Map.fromList [(BigSeaweedPic,bsw)
-                                          ,(FishPic,f)
-                                          ,(SmallSeaweedPic,ssw)]) [b1,b2,b3] [b4]
+  let render = Rendering rd
+                         (Map.fromList [(FishPic,f)
+                                       ,(SmallSeaweedPic,ssw)])
+                        [b1,b2,b3,b4,b5] [f1]
   
   reactimate initialize (sense handle) (actuate render) (process g)
 

@@ -1,5 +1,5 @@
 module Col where 
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 import GHC.Generics (Generic)
 import Control.DeepSeq
 import Types
