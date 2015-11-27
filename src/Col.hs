@@ -6,12 +6,15 @@ import Types
 import Helper
 import Data.List (foldl')
 
-type ColKey = (Int,ID)
+{-# LANGUAGE Arrows, BangPatterns, DeriveGeneric, DeriveAnyClass #-}
+
+
+type ColKey = (Int,ID) 
 
 data Col a =
  Col { colNextKey :: Int
       , colAssocs  :: Map.Map ColKey a
-      }
+      } deriving (Generic,NFData)
 
 instance Functor (Col) where
   fmap f c  = c { colAssocs = Map.map f (colAssocs c)}
@@ -50,5 +53,6 @@ filterCol p c = c { colAssocs = Map.filter p (colAssocs c)}
 
 unionCol :: Col a -> Col a -> Col a
 unionCol c1 c2 = 
-    Col (colNextKey c1 + colNextKey c2)
-        (Map.union (colAssocs c1) (colAssocs c2))
+    let !t = colNextKey c1 + colNextKey c2
+    in Col (seq t t) (Map.union (colAssocs c1) (colAssocs c2))
+     

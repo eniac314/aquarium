@@ -6,17 +6,18 @@ import Types
 import Col
 import Helper
 import System.Random
+import Control.DeepSeq
 
 {-# LANGUAGE Arrows, BangPatterns #-}
 
 process ::  StdGen -> SF GameInput GameOutput
 process g = 
   let bsw = baseSeaweed g
-      ssw = randSeaweeds 25 g
+      ssw = randSeaweeds 24 g
       fs = randFishes 15 g
       c1 = (listToCol Bluefish) fs
       c2 = (listToCol SmallSeaweed) ssw
-      c3 = (unionCol c1 c2) in
+      c3 = insertCol (fst $ randSeaweed g) SmallSeaweed (unionCol c1 c2) in
   proc inp -> do
   rec 
    oOuts <- gameCore c3 -< (inp,oOuts)

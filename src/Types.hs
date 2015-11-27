@@ -39,8 +39,8 @@ type GameOutput = Maybe ([ObjectState],SDLEvent)
 
 data Rendering  = Rendering { render    :: Renderer
                             , spriteMap :: Pics
-                            , bStills    :: [Texture]
-                            , fStills    :: [Texture]
+                            , bStills    :: [(Texture,Pnt)]
+                            , fStills    :: [(Texture,Pnt)]
                             }
 
 type Pics = Map.Map PicName Texture

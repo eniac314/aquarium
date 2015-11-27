@@ -27,8 +27,9 @@ initWindow =
 vsyncRendererConfig = 
   RendererConfig
    { rendererType = AcceleratedVSyncRenderer
-   , rendererTargetTexture = True
+   , rendererTargetTexture = False
    }
+
 
 main = do 
   initializeAll
@@ -40,7 +41,7 @@ main = do
     
   window <- createWindow (Text.pack "aquarium 0.1") initWindow
 
-  rd <- createRenderer window (-1) vsyncRendererConfig
+  rd <- createRenderer window (-1) defaultRenderer
 
   rendererDrawColor rd $= L.V4 0 0 0 0
   
@@ -51,19 +52,40 @@ main = do
   f <- loadTexture rd "./images/bluefish.png"
   bsw <- loadTexture rd "./images/seaweed_test.png"
   ssw <- loadTexture rd "./images/smallSeaweed.png"
+  
+  {-
+  b1 <- loadTexture rd "./images/background.png"
+  b2 <- loadTexture rd "./images/smallBack.png"
+  b3 <- loadTexture rd "./images/smallMidRocks.png"
+  b4 <- loadTexture rd "./images/smallMidStones.png"
+  b5 <- loadTexture rd "./images/smallFrontGreenCoral.png"
+  f1 <- loadTexture rd "./images/smallFrontRedCoral.png"
+
+  let render = Rendering rd
+                         (Map.fromList [(FishPic,f)
+                                       ,(SmallSeaweedPic,ssw)
+                                       ,(BigSeaweedPic,bsw)])
+                        [(b1,(0,0)),(b2,(511,315)),(b3,(0,208))
+                        ,(b4,(0,538)),(b5,(802,90))]
+                        [(f1,(0,307))]
+  -}
+  --{-
   b1 <- loadTexture rd "./images/background.png"
   b2 <- loadTexture rd "./images/Back.png"
   b3 <- loadTexture rd "./images/MidRocks.png"
   b4 <- loadTexture rd "./images/Midstones.png"
   b5 <- loadTexture rd "./images/FrontGreenCorals.png"
   f1 <- loadTexture rd "./images/FrontRedCorals.png"
+  f2 <- loadTexture rd "./images/foreground.png"
 
   let render = Rendering rd
                          (Map.fromList [(FishPic,f)
                                        ,(SmallSeaweedPic,ssw)
                                        ,(BigSeaweedPic,bsw)])
-                        [b1,b2,b3,b4,b5] [f1]
-  
+                        [(b1,(0,0)),(b2,(0,0)),(b3,(0,0))
+                        ,(b4,(0,0)),(b5,(0,0))]
+                        [(f1,(0,0))]
+  ---}
   reactimate initialize (sense handle) (actuate render) (process g)
 
   destroyRenderer rd

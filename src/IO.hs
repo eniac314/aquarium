@@ -41,17 +41,11 @@ actuate (Rendering rd ps bs fs) _ o =
                 Quit        -> (False,True,Nothing)
                 DebugOn     -> (True,False,Nothing)
                 Mouse (x,y) -> (False,False,Just (x,y))
-
-         --let (d,q) =
-         --     case e of
-         --       NoSDLEvent  -> (False,False)
-         --       Quit        -> (False,True)
-         --       DebugOn     -> (True,False)
                 
          clear rd
-         mapM_ (\s -> renderTexture rd s (0,0)) bs
+         mapM_ (\(s,p) -> renderTexture rd s p) bs
          mapM_ (renderObject d) vs  
-         mapM_ (\s -> renderTexture rd s (0,0)) fs
+         mapM_ (\(s,p) -> renderTexture rd s p) fs
          present rd
          --putStrLn . show $ mp
          --if isJust mp
