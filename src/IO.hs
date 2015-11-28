@@ -52,7 +52,7 @@ actuate (Rendering rd ps l0 l1 l2 l3 f1) _ o =
          mapM_ (\(s,p) -> renderTexture rd s p) l1
          mapM_ (renderObject d) o1
          mapM_ (\(s,p) -> renderTexture rd s p) l2
-         mapM_ (renderObject d) (sortOn idSt o2)
+         mapM_ (renderObject d) (sortOn idSt (reverse (sortOn (y3.pos) o2)))
          mapM_ (\(s,p) -> renderTexture rd s p) l3
          mapM_ (renderObject d) o3
          mapM_ (\(s,p) -> renderTexture rd s p) f1  

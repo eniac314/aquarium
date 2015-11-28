@@ -8,8 +8,12 @@ import qualified Data.Vector as Vec
 import Control.DeepSeq
 import Data.List (foldl')
 
-leftAnim = [(FishPic,(x,0),99,37) | x <- [0,99..297]]
-rightAnim = [(FishPic,(x,37),99,37) | x <- [0,99..297]]
+leftAnim = [(FishPic,(x,0),100,38) | x <- [0,100..300]]
+rightAnim = [(FishPic,(x,38),100,38) | x <- [0,100..300]]
+
+pBluefish cur objOut = 
+  300 >= (norm $ (pos . obsState $ objOut) ^-^ (pos . obsState $ cur))
+
 fishMinDist = 130
 maxAccX = 10
 maxAccY = 5

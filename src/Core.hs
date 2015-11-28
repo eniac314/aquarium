@@ -25,19 +25,9 @@ routing =
                ,(Bubble,([],pBubble))
                ,(Shell,([],pShell))]
 
-
-pBluefish cur objOut = 
-  300 >= (norm $ (pos . obsState $ objOut) ^-^ (pos . obsState $ cur)) 
-pSeaWeed  cur objOut = False
-pBubble cur objOut = False
-pShell cur objOut = False
-pSeaHorse cur objOut = 
-  200 >= (norm $ (pos . obsState $ objOut) ^-^ (pos . obsState $ cur))
-
 process ::  StdGen -> SF GameInput GameOutput
 process g = 
-  let bsw = baseSeaweed g
-      ssw = randSeaweeds 9 g
+  let ssw = randSeaweeds 7 g
       shs = randSeaHorses 3 g
       fs = randFishes 15 g
       bub = randBubbles 4 g
@@ -46,7 +36,6 @@ process g =
       c2 = (listToCol SmallSeaweed) ssw
       c3 = (listToCol SeaHorse) shs
       c4 = insertCol she Shell emptyCol
-      --c4 = (listToCol Bubble) bub
       c5 = foldl' unionCol emptyCol [c1,c2,c3,c4] in
   proc inp -> do
   rec 

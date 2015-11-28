@@ -12,6 +12,8 @@ import Data.List (foldl')
 leftAnim = [(SeaHorsePic,(x,0),60,96) | x <- [0,60..180]]
 rightAnim = [(SeaHorsePic,(x,96),60,96) | x <- [0,60..180]]
 seaHorseMinDist = 50
+pSeaHorse cur objOut = 
+  200 >= (norm $ (pos . obsState $ objOut) ^-^ (pos . obsState $ cur))
 vMax = 20
 aMax = 5
 

@@ -119,7 +119,7 @@ processSdlEvent event =
     MouseMotionEvent(MouseMotionEventData _ _ bs (P (L.V2 x y)) _) ->
      Mouse (fromIntegral x, fromIntegral y)
     MouseButtonEvent
-     (MouseButtonEventData _ _ _ ButtonLeft _ (P (L.V2 x y))) ->
+     (MouseButtonEventData _ SDL.Pressed _ ButtonLeft _ (P (L.V2 x y))) ->
       MouseL (fromIntegral x, fromIntegral y) 
     KeyboardEvent (KeyboardEventData _ _ _ (Keysym _ kc _)) ->
      case kc of KeycodeD -> DebugOn

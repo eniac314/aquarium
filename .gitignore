@@ -9,7 +9,6 @@
 *.hi
 
 main
-aquarium
 aqua.sublime-project
 aqua.sublime-workspace
 .cabal-sandbox

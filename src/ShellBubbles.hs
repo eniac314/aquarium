@@ -18,6 +18,9 @@ shellOpened  = (ShellPic,(328,0),164,105)
 
 shellSpr = cycle $ [shellClosed,shellOpening,shellOpened]
 
+pBubble cur objOut = False
+pShell cur objOut = False
+
 bubble :: ObjectInit -> Object 
 bubble initial = 
   proc inp -> do
@@ -35,7 +38,7 @@ bubble initial =
                  }
   
       out = ObjOutput { obsState = deepseq st st
-                      , killReq  = if t > 15 
+                      , killReq  = if t > 10 
                                    then Event ()
                                    else NoEvent
                       , spawnReq = NoEvent
@@ -50,8 +53,8 @@ bubble initial =
 randBubble :: StdGen -> (Object,StdGen)
 randBubble g = 
   let (x,g1) = randomR (740, 830) g
-      y      = 138
-      (u,v)  = (0,50)
+      y      = 143
+      (u,v)  = (0,90)
       (n,g2) = randomR (0,30) g1
       cs | n+u < 10 = zip smallBubble smallBubble
          | n < 20 = zip midBubble midBubble
@@ -74,17 +77,16 @@ shell ss initial = dSwitch shell' onClick
   shell' = 
    proc (ObjInput (GameInput _ ev) _) -> do
    
-   --e1 <- edge       -< isClosed
-   --e2 <- edge       -< isOpening
-   --e3 <- edge       -< isOpened
    
    ec <- edgeTag Opening -< isClosed && clicked ev
 
    e3 <- after 0.1 Opened  -< ()
-   e4 <- after 0.5 Closed  -< ()
 
-   --e5 <- after 1 Opened  -< isEvent e2
-   --e6 <- after 2 Closed  -< isEvent e3
+   e4 <- edgeTag Closed -< isOpened && clicked ev
+   e5 <- occasionally g 0.4 () -< ()
+
+   rec 
+    (n,g') <- iPre (0,g) <<< arr next -< g'
 
    let st = Thing { pos = pos0 initial
                   , vel = vel0 initial
@@ -95,11 +97,11 @@ shell ss initial = dSwitch shell' onClick
   
        out = ObjOutput { obsState = deepseq st st
                        , killReq  = NoEvent
-                       , spawnReq = bubbleDispenser
+                       , spawnReq = bubbleDispenser e5 g'
                        }
+
        e = merge ec (merge (gate e3 isOpening)
                            (gate e4 isOpened))
-       --e = ec
 
    returnA -< (out,e)
    
@@ -118,10 +120,11 @@ shell ss initial = dSwitch shell' onClick
     
     g = gen0 initial
     
-    bubbleDispenser
-     | isOpening = Event [(Bubble,(fst . randBubble $ g))]
-     | otherwise = NoEvent
 
+    bubbleDispenser ev g
+     | isOpening || isOpened = tag ev [(Bubble,(fst . randBubble $ g))]
+     | otherwise = NoEvent
+  
   onClick ev = shell ev (nextSpr initial)
    where nextSpr ini =
           ini { sprites0 = tail . sprites0 $ ini
@@ -131,5 +134,5 @@ shell ss initial = dSwitch shell' onClick
 baseShell :: StdGen -> Object
 baseShell g = 
   let cs = zip shellSpr shellSpr
-      sh = ThingInit (785,140,0) nullVec nullVec cs g Shell
+      sh = ThingInit (785,146,0) nullVec nullVec cs g Shell
   in shell Closed sh

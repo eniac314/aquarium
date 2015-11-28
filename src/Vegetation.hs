@@ -11,6 +11,8 @@ import Data.List (foldl')
 
 bigSeaweedAnim = [(BigSeaweedPic,(x,0),438,348)| x <- [0,438..2190]]
 smallSeaweedAnim = [(SmallSeaweedPic,(x,0),171,185)| x <- [0,171..513]]
+pSeaWeed  cur objOut = False
+
 
 seaweed :: ObjectInit -> Object
 seaweed initial = 

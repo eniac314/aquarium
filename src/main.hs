@@ -22,7 +22,8 @@ import qualified Data.Map.Strict as Map
 
 initWindow = 
     defaultWindow
-     { windowInitialSize = L.V2 (windowWidth) (windowHeight)}
+     { windowInitialSize = L.V2 (windowWidth) (windowHeight)
+     , windowMode = Windowed }
 
 vsyncRendererConfig = 
   RendererConfig
@@ -39,7 +40,7 @@ main = do
   when (renderQuality /= ScaleLinear) $
    putStrLn "Warning: Linear texture filtering not enabled!"
     
-  window <- createWindow (Text.pack "aquarium 0.1") initWindow
+  window <- createWindow (Text.pack "aquarium 1.0") initWindow
 
   rd <- createRenderer window (-1) defaultRenderer
 
@@ -49,7 +50,7 @@ main = do
 
   g <- getStdGen
 
-  f <- loadTexture rd "./images/bluefish.png"
+  f <- loadTexture rd "./images/fish_sheet.png"
   sh <- loadTexture rd "./images/SeahorseSheet.png"
   bsw <- loadTexture rd "./images/seaweed_test.png"
   ssw <- loadTexture rd "./images/SeaweedNew.png"
@@ -74,9 +75,9 @@ main = do
   -}
   --{-
   b1 <- loadTexture rd "./images/background.png"
-  b2 <- loadTexture rd "./images/Back.png"
-  b3 <- loadTexture rd "./images/MidRocks.png"
-  b4 <- loadTexture rd "./images/Midstones.png"
+  b2 <- loadTexture rd "./images/Back2.png"
+  b3 <- loadTexture rd "./images/MidRocks3.png"
+  b4 <- loadTexture rd "./images/Midstones4.png"
   b5 <- loadTexture rd "./images/FrontGreenCorals.png"
   f1 <- loadTexture rd "./images/FrontRedCorals.png"
   f2 <- loadTexture rd "./images/foreground.png"
