@@ -8,8 +8,8 @@ import qualified Data.Vector as Vec
 import Control.DeepSeq
 import Data.List (foldl')
 
-fishLeftAnim = [(FishPic,(x,0),99,37) | x <- [0,99..297]]
-fishRightAnim = [(FishPic,(x,37),99,37) | x <- [0,99..297]]
+leftAnim = [(FishPic,(x,0),99,37) | x <- [0,99..297]]
+rightAnim = [(FishPic,(x,37),99,37) | x <- [0,99..297]]
 fishMinDist = 130
 maxAccX = 10
 maxAccY = 5
@@ -103,7 +103,7 @@ randFish g =
       (v,g4) = randomR (-40,40) g3
       (a,g5) = randomR (-10,10) g4
       (b,g6) = randomR (-5,5) g5
-      cs = zip fishLeftAnim fishRightAnim
+      cs = zip leftAnim rightAnim
       fi = AnimalInit (x,y,0) (u,v,0) (a,b,0) cs g6 Bluefish
   in (fish fi,g6)
 

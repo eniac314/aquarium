@@ -16,6 +16,11 @@ windowWidth = 1366 :: CInt
 windowHeight = 768 :: CInt
 center = (0.5 * fromIntegral windowWidth, 0.5 * fromIntegral windowHeight,0) :: Vec3
 
+levels = ([]
+         ,[]
+         ,[SmallSeaweed,Shell,Bubble,Bluefish]
+         ,[SeaHorse])
+
 type Scalar = Double
 type Vec3 = (Scalar,Scalar,Scalar)
 type Pos = Vec3
@@ -39,14 +44,28 @@ type GameOutput = Maybe ([ObjectState],SDLEvent)
 
 data Rendering  = Rendering { render    :: Renderer
                             , spriteMap :: Pics
-                            , bStills    :: [(Texture,Pnt)]
-                            , fStills    :: [(Texture,Pnt)]
+                            , level0    :: [(Texture,Pnt)]
+                            , level1    :: [(Texture,Pnt)]
+                            , level2    :: [(Texture,Pnt)]
+                            , level3    :: [(Texture,Pnt)]
+                            , foreGr    :: [(Texture,Pnt)]
                             }
 
 type Pics = Map.Map PicName Texture
 
 --------------------------------------------------------------------------
 {- Objects Types -}
+
+data ObjInput = 
+ ObjInput { gi :: !GameInput
+          , envi :: ![ObjectState]
+          } 
+
+data ObjOutput = 
+ ObjOutput { obsState :: !ObjectState
+           , killReq  :: !(Event ())
+           , spawnReq :: !(Event [(ID,Object)])
+           } 
 
 data ObjectInit = 
   AnimalInit { pos0 :: !Pos
@@ -84,16 +103,7 @@ data ObjectState =
 
 type Object = SF ObjInput ObjOutput
 
-data ObjInput = 
- ObjInput { gi :: !GameInput
-          , envi :: ![ObjectState]
-          } 
 
-data ObjOutput = 
- ObjOutput { obsState :: !ObjectState
-           , killReq  :: !(Event ())
-           , spawnReq :: !(Event [Object])
-           } 
 
 --------------------------------------------------------------------------
 {- Miscs -}
@@ -114,17 +124,24 @@ data PicName = FishPic
              | StonePic
              | BubblePic
              | BigSeaweedPic
+             | SeaHorsePic
+             | ShellPic
+             | TurtlePic
              | SmallSeaweedPic deriving (Ord,Eq,Show,Generic,NFData)
 
-data ID = Bluefish
-        | Stone
+data ID = Stone
         | BigSeaweed
+        | Shell
+        | Bubble
         | SmallSeaweed
-        | Bubble deriving (Ord,Eq,Show,Generic,NFData)
+        | SeaHorse
+        | Turtle
+        | Bluefish deriving (Ord,Eq,Show,Generic,NFData)
 
 
 data SDLEvent = Quit | Mouse (Double,Double) | NoSDLEvent | DebugOn
-              | MouseL ButtonState | MouseR ButtonState
+              | MouseL (Double,Double) 
+              | MouseR (Double,Double)
 
 data ButtonState = Pressed | Released
 

@@ -11,6 +11,7 @@ import Foreign.C.Types
 import qualified Data.Map.Strict as Map
 import Data.Maybe (fromJust, isJust)
 import Text.Show.Pretty (ppShow)
+import Data.List (sortOn)
 import qualified Linear as L
 import Control.DeepSeq
 
@@ -31,7 +32,7 @@ sense ref _ = do
   return (dt, Just (GameInput timePassed (processSdlEvent event)))
 
 actuate :: Rendering -> Bool -> GameOutput -> IO Bool
-actuate (Rendering rd ps bs fs) _ o = 
+actuate (Rendering rd ps l0 l1 l2 l3 f1) _ o = 
   case o of 
     Nothing -> return True
     Just (vs,e) ->
@@ -41,11 +42,21 @@ actuate (Rendering rd ps bs fs) _ o =
                 Quit        -> (False,True,Nothing)
                 DebugOn     -> (True,False,Nothing)
                 Mouse (x,y) -> (False,False,Just (x,y))
-                
+                _           -> (False,False,Nothing)
+             (o0,o1,o2,o3) = toLevels vs levels
+
          clear rd
-         mapM_ (\(s,p) -> renderTexture rd s p) bs
-         mapM_ (renderObject d) vs  
-         mapM_ (\(s,p) -> renderTexture rd s p) fs
+         
+         mapM_ (\(s,p) -> renderTexture rd s p) l0
+         mapM_ (renderObject d) o0
+         mapM_ (\(s,p) -> renderTexture rd s p) l1
+         mapM_ (renderObject d) o1
+         mapM_ (\(s,p) -> renderTexture rd s p) l2
+         mapM_ (renderObject d) (sortOn idSt o2)
+         mapM_ (\(s,p) -> renderTexture rd s p) l3
+         mapM_ (renderObject d) o3
+         mapM_ (\(s,p) -> renderTexture rd s p) f1  
+         
          present rd
          --putStrLn . show $ mp
          --if isJust mp
@@ -57,9 +68,10 @@ actuate (Rendering rd ps bs fs) _ o =
          let (x,y,_) = pos v
              (u,k,_) = vel v
              (a,b,_) = acc v
+             id      = idSt v
 
              (pn, pntSrc, w, h) =
-              if u <= 0
+              if u <= 0 && idSt v == Bluefish
               then fst $ sprites v
               else snd $ sprites v
 

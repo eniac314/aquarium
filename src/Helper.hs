@@ -6,6 +6,7 @@ import qualified Data.Vector as Vec
 import SDL hiding (time, Mouse)
 import qualified Linear as L 
 import Linear.Affine
+import Data.List (foldl')
 
 osc :: Int -> Int -> Int -> [Int]
 osc a b c = cycle $ [a,a+c..b] ++ [b,b-c..a+c]
@@ -13,8 +14,9 @@ osc a b c = cycle $ [a,a+c..b] ++ [b,b-c..a+c]
 slow :: Int -> [a] -> [a]
 slow 0 xs = xs
 slow n [] = []
-slow n (x:xs) = go n x [] ++ (slow n xs) where go 0 _ xs = xs
-                                               go n x xs = go (n-1) x (x:xs)
+slow n (x:xs) = go n x [] ++ (slow n xs) 
+ where go 0 _ xs = xs
+       go n x xs = go (n-1) x (x:xs)
 
 getPos :: ObjOutput -> Pos
 getPos = pos . obsState
@@ -116,11 +118,27 @@ processSdlEvent event =
     QuitEvent -> Quit
     MouseMotionEvent(MouseMotionEventData _ _ bs (P (L.V2 x y)) _) ->
      Mouse (fromIntegral x, fromIntegral y)
+    MouseButtonEvent
+     (MouseButtonEventData _ _ _ ButtonLeft _ (P (L.V2 x y))) ->
+      MouseL (fromIntegral x, fromIntegral y) 
     KeyboardEvent (KeyboardEventData _ _ _ (Keysym _ kc _)) ->
      case kc of KeycodeD -> DebugOn
                 KeycodeEscape -> Quit
                 _        -> NoSDLEvent
     _ -> NoSDLEvent 
+
+type Levels = ([ID],[ID],[ID],[ID])
+
+toLevels :: [ObjectState] -> Levels ->
+ ([ObjectState],[ObjectState],[ObjectState],[ObjectState])
+toLevels objs (a,b,c,d) = 
+ let f (a',b',c',d') o
+      | elem (idSt o) a = (o:a',b',c',d')
+      | elem (idSt o) b = (a',o:b',c',d')
+      | elem (idSt o) c = (a',b',o:c',d')
+      | elem (idSt o) d = (a',b',c',o:d')
+ in foldl' f ([],[],[],[]) objs 
+
 
 
 --flocking' :: (Vec3,Vec3, ObjInput,Vec3) -> Vec3

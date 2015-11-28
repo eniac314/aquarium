@@ -10,17 +10,17 @@ import Data.List (foldl')
 
 
 bigSeaweedAnim = [(BigSeaweedPic,(x,0),438,348)| x <- [0,438..2190]]
-smallSeaweedAnim = [(SmallSeaweedPic,(x,0),128,102)| x <- [0,128..640]]
+smallSeaweedAnim = [(SmallSeaweedPic,(x,0),171,185)| x <- [0,171..513]]
 
 seaweed :: ObjectInit -> Object
 seaweed initial = 
   proc inp -> do
 
-  r  <- noiseR (1,5) (gen0 initial)        -< ()
+  r  <- noiseR (1,5) (gen0 initial)         -< ()
   
   e  <- repeatedly 1 ()                     -< ()
 
-  r' <- hold 5                               -< tag e r
+  r' <- hold 5                              -< tag e r
   
   s  <- listToSignal (sprites0 initial) 1 1 -< r'
 
@@ -45,7 +45,7 @@ baseSeaweed g =
 
 randSeaweed :: StdGen -> (Object,StdGen)
 randSeaweed g = 
-  let (x,g1) = randomR (25, 775) g
+  let (x,g1) = randomR (25, 900) g
       (y,g2) = randomR (25,150) g1
       cs = zip smallSeaweedAnim smallSeaweedAnim
       sw = ThingInit (x,y,0) nullVec nullVec cs g2 SmallSeaweed
